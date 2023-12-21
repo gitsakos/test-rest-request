@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 )
 
-func TestGetEndpoint(path string, responseStruct interface{}, idToken string) error {
+func GetEndpoint(path string, responseStruct interface{}, idToken string) error {
 
 	req := httptest.NewRequest(http.MethodGet, path, nil)
 
@@ -40,16 +40,16 @@ func TestGetEndpoint(path string, responseStruct interface{}, idToken string) er
 	return err
 }
 
-func TestPostEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return testPostOrPutEndpoint(http.MethodPost, path, body, responseStruct, idToken)
+func PostEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
+	return postOrPutEndpoint(http.MethodPost, path, body, responseStruct, idToken)
 }
-func TestPutEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return testPostOrPutEndpoint(http.MethodPut, path, body, responseStruct, idToken)
+func PutEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
+	return postOrPutEndpoint(http.MethodPut, path, body, responseStruct, idToken)
 }
-func TestDeleteEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return testPostOrPutEndpoint(http.MethodDelete, path, body, responseStruct, idToken)
+func DeleteEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
+	return postOrPutEndpoint(http.MethodDelete, path, body, responseStruct, idToken)
 }
-func testPostOrPutEndpoint(method string, path string, body interface{}, responseStruct interface{}, idToken string) error {
+func postOrPutEndpoint(method string, path string, body interface{}, responseStruct interface{}, idToken string) error {
 
 	var buf bytes.Buffer
 	if body != nil {
