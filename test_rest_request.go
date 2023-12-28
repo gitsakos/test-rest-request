@@ -14,9 +14,7 @@ import (
 
 var Handler http.Handler
 
-type Client struct{
-	Headers map[string]string
-}
+
 
 func init(){
 	if Handler == nil{
@@ -24,16 +22,16 @@ func init(){
 	}
 }
 
-func (m Client) GetEndpoint(path string, responseStruct interface{}, idToken string) error {
+func GetEndpoint(path string, headers map[string]string, responseStruct interface{}) error {
 
 	req := httptest.NewRequest(http.MethodGet, path, nil)
 
-	if idToken != "" {
-		req.Header.Set("idToken", idToken)
+	for key, val := range headers {
+		req.Header.Set(key, val)
 	}
 
 	w := httptest.NewRecorder()
-	http.DefaultServeMux.ServeHTTP(w, req)
+	Handler.ServeHTTP(w, req)
 	res := w.Result()
 	defer res.Body.Close()
 
@@ -46,7 +44,7 @@ func (m Client) GetEndpoint(path string, responseStruct interface{}, idToken str
 	fmt.Print(string(data))
 
 	if res.StatusCode != 200 {
-		return fmt.Errorf("%s %s", res.Status, string(data))
+		return fmt.Errorf("%s %s %s", path, res.Status, string(data))
 	}
 	if responseStruct != nil {
 		err = json.Unmarshal(data, responseStruct)
@@ -55,16 +53,16 @@ func (m Client) GetEndpoint(path string, responseStruct interface{}, idToken str
 	return err
 }
 
-func (m Client) PostEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return postOrPutEndpoint(http.MethodPost, m.Headers, path, body, responseStruct, idToken)
+func PostEndpoint(path string, headers map[string]string,  body interface{}, responseStruct interface{}) error {
+	return postOrPutEndpoint(http.MethodPost, headers, path, body, responseStruct)
 }
-func (m Client) PutEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return postOrPutEndpoint(http.MethodPut, m.Headers, path, body, responseStruct, idToken)
+func PutEndpoint(path string,  headers map[string]string, body interface{}, responseStruct interface{}) error {
+	return postOrPutEndpoint(http.MethodPut, headers, path, body, responseStruct)
 }
-func (m Client) DeleteEndpoint(path string, body interface{}, responseStruct interface{}, idToken string) error {
-	return postOrPutEndpoint(http.MethodDelete, m.Headers, path, body, responseStruct, idToken)
+func DeleteEndpoint(path string,  headers map[string]string, body interface{}, responseStruct interface{}) error {
+	return postOrPutEndpoint(http.MethodDelete, headers, path, body, responseStruct)
 }
-func postOrPutEndpoint(method string, headers map[string]string, path string, body interface{}, responseStruct interface{}, idToken string) error {
+func postOrPutEndpoint(method string, headers map[string]string, path string, body interface{}, responseStruct interface{}) error {
 
 	var req *http.Request
 
@@ -92,9 +90,6 @@ func postOrPutEndpoint(method string, headers map[string]string, path string, bo
 
 	for key, val := range headers {
 		req.Header.Set(key, val)
-	}
-	if idToken != "" {
-		req.Header.Set("idToken", idToken)
 	}
 
 	w := httptest.NewRecorder()
